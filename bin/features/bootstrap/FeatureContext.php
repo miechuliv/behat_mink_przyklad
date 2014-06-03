@@ -21,6 +21,8 @@ use    Behat\MinkExtension\Context\MinkContext;
  */
 class FeatureContext extends MinkContext
 {
+
+    private $_baseUrl = 'http://demo.stronazen.pl/ruwelt/';
     /**
      * Initializes context.
      * Every scenario gets it's own context object.
@@ -48,13 +50,22 @@ class FeatureContext extends MinkContext
      */
     public function jestemNaStronie($page)
     {
-        $this->getSession()->visit($this->locatePath($page));
+        $this->getSession()->visit($this->locatePath($this->_baseUrl.$page));
     }
 
     /**
-     * @When /^wpisuje w  "([^"]*)" haslo "([^"]*)"$/
+     * @Then /^przekierowanie do "([^"]*)"$/
      */
-    public function wpisujeWHaslo($field,$value)
+    public function przekierowanieDo($page)
+    {
+
+        $this->assertSession()->addressEquals($this->_baseUrl.$page);
+    }
+
+    /**
+     * @When /^wpisuje w pole wartosc "([^"]*)" "([^"]*)"$/
+     */
+    public function wpisujeWPoleWartosc($field,$value)
     {
         $field = $this->fixStepArgument($field);
         $value = $this->fixStepArgument($value);
@@ -63,12 +74,88 @@ class FeatureContext extends MinkContext
 
 
     /**
-     * @Given /^wciskam "([^"]*)"$/
+     * @When /^wciskam "([^"]*)"$/
      */
     public function wciskam($button)
     {
         $button = $this->fixStepArgument($button);
         $this->getSession()->getPage()->pressButton($button);
+    }
+
+    /**
+     * @When /^zaznaczam "([^"]*)"$/
+     */
+    public function zaznaczam($field)
+    {
+        $field = $this->fixStepArgument($field);
+        $this->getSession()->getPage()->checkField($field);
+        $field = $this->getSession()->getPage()->findField($field);
+        $field->click();
+        $this->getSession()->executeScript('jQuery(\'input[name="shipping[same_as_billing]"]\').prop(\'checked\',false)');
+        $this->getSession()->executeScript('shipping.setSameAsBilling(false);');
+
+    }
+
+    /**
+     * @When /^czekam "([^"]*)"$/
+     */
+    public function czekam($duration)
+    {
+        $this->getSession()->wait((int)$duration );
+        // asserts below
+    }
+
+
+
+    /**
+     * @When /^uzywam button o klasie "([^"]*)"$/
+     */
+    public function uzywamButtonOKlasie($class)
+    {
+        $elementsByCss = $this->getSession()->getPage()->findAll('css', $class);
+        $elementsByCss->click();
+    }
+
+    /**
+     * @When /^uzupelniem formularz billing w kasie$/
+     */
+    public function uzupelniemFormularzBillingWKasie()
+    {
+        $this->getSession()->getPage()->fillField('billing[firstname]', 'hans');
+        $this->getSession()->getPage()->fillField('billing[lastname]', 'gruber');
+        $this->getSession()->getPage()->fillField('billing[email]', 'miechuliv@tlen.pl');
+        $this->getSession()->getPage()->fillField('billing[street][]', 'jakas');
+        $this->getSession()->getPage()->fillField('billing[postcode]', '90-900');
+        $this->getSession()->getPage()->fillField('billing[city]', 'berlin');
+
+        $region = $this->getSession()->getPage()->findField('billing[region_id]');
+        $region->selectOption('Bremen');
+
+        $city = $this->getSession()->getPage()->findField('billing[country_id]');
+        $city->selectOption('Deutschland');
+
+        $this->getSession()->getPage()->fillField('billing[telephone]', '345345345');
+    }
+
+    /**
+     * @When /^uzupelniem formularz shipping w kasie$/
+     */
+    public function uzupelniemFormularzShippingWKasie()
+    {
+        $this->getSession()->getPage()->fillField('shipping[firstname]', 'hans2');
+        $this->getSession()->getPage()->fillField('shipping[lastname]', 'gruber2');
+       // $this->getSession()->getPage()->fillField('shipping[email]', 'miechuliv@tlen.pl');
+        $this->getSession()->getPage()->fillField('shipping[street][]', 'jakas2');
+        $this->getSession()->getPage()->fillField('shipping[postcode]', '90-900');
+        $this->getSession()->getPage()->fillField('shipping[city]', 'berlin2');
+
+        $region = $this->getSession()->getPage()->findField('shipping[region_id]');
+        $region->selectOption('Bremen');
+
+        $city = $this->getSession()->getPage()->findField('shipping[country_id]');
+        $city->selectOption('Deutschland');
+
+        $this->getSession()->getPage()->fillField('shipping[telephone]', '345345345');
     }
 
     /**

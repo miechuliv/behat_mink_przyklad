@@ -4,5 +4,6 @@ default:
     bootstrap: %behat.paths.features%/bootstrap
   extensions:
     Behat\MinkExtension\Extension:
+      browser_name: googlechrome
       goutte: ~
       selenium2: ~

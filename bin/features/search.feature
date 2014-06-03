@@ -1,16 +1,24 @@
-Feature: Search
+Feature: Checkout
   szukaj bla bla
 
+ # @javascript
+ # Scenario: dodanie produktu do koszyka
+ #   Given jestem na stronie "russische-spezialitaten/koffeinhaltiges-erfrischungsgetrank-mit-50-molkenerzeugnis-russian-power-pfandfrei-250-ml.html"
 
-  Scenario: szukamy istniejacej strony
-    Given jestem na stronie "http://www.wikipedia.com/wiki/Main_Page"
-    When wpisuje w  "search" haslo "Behavior driven development"
-    And wciskam "searchButton"
-    Then powinienem zobaczyc "agile software development"
+  #  When wciskam "In den Warenkorb"
+  #  Then przekierowanie do "checkout/cart/"
 
+  @javascript
+  Scenario: kasa dla nie zalogowanego , dwa osobne adresy
+    Given jestem na stronie "russische-spezialitaten/koffeinhaltiges-erfrischungsgetrank-mit-50-molkenerzeugnis-russian-power-pfandfrei-250-ml.html"
 
-  Scenario: szukanie nie istniejącej strony
-    Given jestem na stronie "http://www.wikipedia.com/wiki/Main_Page"
-    When wpisuje w  "search" haslo "Glory Driven Development"
-    And wciskam "searchButton"
-    Then powinienem zobaczyc "Search Results"
+    When wciskam "In den Warenkorb"
+    And wciskam "zur Kasse gehen"
+
+    And zaznaczam "billing:use_for_shipping_no"
+    And czekam "10000"
+    And uzupelniem formularz billing w kasie
+
+    And uzupelniem formularz shipping w kasie
+    And wciskam "In den Warenkorb"
+    Then przekierowanie do "checkout/onepage/success/"
